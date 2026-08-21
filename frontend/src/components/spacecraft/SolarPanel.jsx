@@ -1,46 +1,118 @@
 function SolarPanel({
   position,
-  side,
+  rotation = [0, 0, 0],
   onSelect,
   powerFailure = false
 }) {
-  const direction = side === "left" ? -1 : 1
+
+  const panelColor =
+    powerFailure
+      ? "#351010"
+      : "#101a3d"
+
+  const gridColor =
+    powerFailure
+      ? "#ff4a4a"
+      : "#91a9d0"
+
 
   return (
     <group
       position={position}
+      rotation={rotation}
       onClick={(event) => {
+
         event.stopPropagation()
 
         if (onSelect) {
           onSelect()
         }
+
       }}
     >
+
+      {/* SUPPORT ARM */}
+
       <mesh
         position={[
-          direction * 0.6,
+          0.60,
           0,
           0
         ]}
       >
         <boxGeometry
           args={[
-            1.2,
-            0.11,
-            0.11
+            1.20,
+            0.10,
+            0.10
           ]}
         />
 
         <meshStandardMaterial
           color={
             powerFailure
-              ? "#7a2020"
-              : "#747777"
+              ? "#8d2929"
+              : "#73797c"
           }
+          metalness={0.86}
+          roughness={0.25}
+        />
+      </mesh>
+
+
+      {/* ROTATION JOINT */}
+
+      <mesh
+        position={[
+          1.15,
+          0,
+          0
+        ]}
+      >
+        <sphereGeometry
+          args={[
+            0.15,
+            18,
+            18
+          ]}
+        />
+
+        <meshStandardMaterial
+          color={
+            powerFailure
+              ? "#a82b2b"
+              : "#62686b"
+          }
+          metalness={0.85}
+          roughness={0.24}
+        />
+      </mesh>
+
+
+      {/* ======================================
+          SLIGHTLY LARGER SOLAR PANEL
+      ====================================== */}
+
+      <mesh
+        position={[
+          2.35,
+          0,
+          0
+        ]}
+      >
+        <boxGeometry
+          args={[
+            2.35,
+            0.06,
+            1.25
+          ]}
+        />
+
+        <meshStandardMaterial
+          color={panelColor}
           emissive={
             powerFailure
-              ? "#ff0000"
+              ? "#450000"
               : "#000000"
           }
           emissiveIntensity={
@@ -48,76 +120,42 @@ function SolarPanel({
               ? 0.7
               : 0
           }
-          metalness={0.9}
-          roughness={0.25}
+          metalness={0.42}
+          roughness={0.27}
         />
       </mesh>
 
-      <mesh
-        position={[
-          direction * 1.8,
-          0,
-          0
-        ]}
-      >
-        <boxGeometry
-          args={[
-            2.4,
-            0.07,
-            1.05
-          ]}
-        />
 
-        <meshStandardMaterial
-          color={
-            powerFailure
-              ? "#260707"
-              : "#071d3e"
-          }
-          emissive={
-            powerFailure
-              ? "#500000"
-              : "#000000"
-          }
-          emissiveIntensity={
-            powerFailure
-              ? 0.8
-              : 0
-          }
-          metalness={0.55}
-          roughness={0.28}
-        />
-      </mesh>
+      {/* VERTICAL CELL LINES */}
 
       {[
-        -0.8,
-        -0.4,
+        -0.90,
+        -0.60,
+        -0.30,
         0,
-        0.4,
-        0.8
+        0.30,
+        0.60,
+        0.90
       ].map((offset) => (
+
         <mesh
-          key={offset}
+          key={`v-${offset}`}
           position={[
-            direction * 1.8 + offset,
-            0.045,
+            2.35 + offset,
+            0.046,
             0
           ]}
         >
           <boxGeometry
             args={[
-              0.018,
+              0.014,
               0.012,
-              1
+              1.20
             ]}
           />
 
           <meshStandardMaterial
-            color={
-              powerFailure
-                ? "#ff4040"
-                : "#748da7"
-            }
+            color={gridColor}
             emissive={
               powerFailure
                 ? "#ff0000"
@@ -125,40 +163,43 @@ function SolarPanel({
             }
             emissiveIntensity={
               powerFailure
-                ? 1
+                ? 0.8
                 : 0
             }
           />
         </mesh>
+
       ))}
 
+
+      {/* HORIZONTAL CELL LINES */}
+
       {[
-        -0.32,
+        -0.42,
+        -0.21,
         0,
-        0.32
+        0.21,
+        0.42
       ].map((offset) => (
+
         <mesh
-          key={offset}
+          key={`h-${offset}`}
           position={[
-            direction * 1.8,
-            0.045,
+            2.35,
+            0.047,
             offset
           ]}
         >
           <boxGeometry
             args={[
-              2.35,
+              2.30,
               0.012,
-              0.015
+              0.014
             ]}
           />
 
           <meshStandardMaterial
-            color={
-              powerFailure
-                ? "#ff4040"
-                : "#748da7"
-            }
+            color={gridColor}
             emissive={
               powerFailure
                 ? "#ff0000"
@@ -166,38 +207,46 @@ function SolarPanel({
             }
             emissiveIntensity={
               powerFailure
-                ? 1
+                ? 0.8
                 : 0
             }
           />
         </mesh>
+
       ))}
 
+
+      {/* POWER FAILURE LIGHT */}
+
       {powerFailure && (
+
         <mesh
           position={[
-            direction * 1.8,
-            0.11,
+            2.35,
+            0.12,
             0
           ]}
         >
           <sphereGeometry
             args={[
-              0.10,
-              20,
-              20
+              0.085,
+              18,
+              18
             ]}
           />
 
           <meshStandardMaterial
-            color="#ff0000"
+            color="#ff3030"
             emissive="#ff0000"
             emissiveIntensity={3}
           />
         </mesh>
+
       )}
+
     </group>
   )
 }
+
 
 export default SolarPanel
