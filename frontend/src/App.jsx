@@ -125,16 +125,47 @@ function App() {
     setSimulation
   ] = useState(null)
 
-  const selectedTelemetry =
-    selectedSystem
-      ? telemetry[selectedSystem]
-      : null
 
   const oxygenLeak =
     simulation === "oxygen_leak"
 
   const powerFailure =
     simulation === "power_failure"
+
+
+  const isPowerAffectedSystem =
+    powerFailure &&
+    (
+      selectedSystem === "power" ||
+      selectedSystem === "solar_left" ||
+      selectedSystem === "solar_right"
+    )
+
+
+  const isCriticalSystem =
+    (
+      selectedSystem === "life_support" &&
+      oxygenLeak
+    ) ||
+    isPowerAffectedSystem
+
+
+  const selectedTelemetry =
+    selectedSystem
+      ? {
+          ...telemetry[selectedSystem],
+
+          status:
+            isPowerAffectedSystem
+              ? "critical"
+              : telemetry[selectedSystem].status,
+
+          problem:
+            isPowerAffectedSystem
+              ? "Power Generation Failure"
+              : telemetry[selectedSystem].problem
+        }
+      : null
 
 
   const handleOxygenLeak = async () => {
@@ -379,21 +410,10 @@ function App() {
 
 
       <EmergencyPanel
-        simulation={
-          simulation
-        }
-
-        onOxygenLeak={
-          handleOxygenLeak
-        }
-
-        onPowerFailure={
-          handlePowerFailure
-        }
-
-        onReset={
-          handleReset
-        }
+        simulation={simulation}
+        onOxygenLeak={handleOxygenLeak}
+        onPowerFailure={handlePowerFailure}
+        onReset={handleReset}
       />
 
 
@@ -409,14 +429,7 @@ function App() {
             color: "#dbffee",
 
             border:
-              (
-                selectedSystem === "life_support" &&
-                oxygenLeak
-              ) ||
-              (
-                selectedSystem === "power" &&
-                powerFailure
-              )
+              isCriticalSystem
                 ? "1px solid #ff4747"
                 : "1px solid rgba(60,255,150,0.40)",
 
@@ -448,32 +461,16 @@ function App() {
             <span
               style={{
                 color:
-                  (
-                    selectedSystem === "life_support" &&
-                    oxygenLeak
-                  ) ||
-                  (
-                    selectedSystem === "power" &&
-                    powerFailure
-                  )
+                  isCriticalSystem
                     ? "#ff4d4d"
                     : "#58ff98"
               }}
             >
-
               {
-                (
-                  selectedSystem === "life_support" &&
-                  oxygenLeak
-                ) ||
-                (
-                  selectedSystem === "power" &&
-                  powerFailure
-                )
+                isCriticalSystem
                   ? "● CRITICAL"
                   : "● NORMAL"
               }
-
             </span>
           </div>
 
@@ -490,8 +487,7 @@ function App() {
 
                 ? "⚠ Oxygen Leak Detected"
 
-                : selectedSystem === "power" &&
-                  powerFailure
+                : isPowerAffectedSystem
 
                 ? "⚠ Power Generation Failure"
 
