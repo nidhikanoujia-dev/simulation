@@ -7,7 +7,9 @@ export default function ServiceModule() {
         -0.25
       ]}
     >
-      {/* LONG SILVER SERVICE BODY */}
+
+      {/* MAIN SERVICE MODULE */}
+
       <mesh
         rotation={[
           Math.PI / 2,
@@ -20,77 +22,27 @@ export default function ServiceModule() {
             1.38,
             1.42,
             4.85,
-            64
+            72
           ]}
         />
 
         <meshStandardMaterial
-          color="#9ea3a4"
-          metalness={0.62}
-          roughness={0.41}
+          color="#898f91"
+          metalness={0.74}
+          roughness={0.31}
         />
       </mesh>
 
 
-      {/* FRONT COUPLING */}
-      <mesh
-        position={[0, 0, -2.40]}
-        rotation={[
-          Math.PI / 2,
-          0,
-          0
-        ]}
-      >
-        <torusGeometry
-          args={[
-            1.38,
-            0.09,
-            14,
-            64
-          ]}
-        />
+      {/* BODY STRUCTURAL BANDS */}
 
-        <meshStandardMaterial
-          color="#34393c"
-          metalness={0.88}
-          roughness={0.23}
-        />
-      </mesh>
-
-
-      {/* REAR COUPLING */}
-      <mesh
-        position={[0, 0, 2.40]}
-        rotation={[
-          Math.PI / 2,
-          0,
-          0
-        ]}
-      >
-        <torusGeometry
-          args={[
-            1.42,
-            0.10,
-            14,
-            64
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#34393c"
-          metalness={0.88}
-          roughness={0.23}
-        />
-      </mesh>
-
-
-      {/* BODY RINGS */}
       {[
-        -1.55,
-        -0.75,
-        0,
-        0.75,
-        1.55
+        -2.08,
+        -1.30,
+        -0.48,
+        0.35,
+        1.18,
+        2.08
       ].map((z) => (
         <mesh
           key={z}
@@ -108,115 +60,182 @@ export default function ServiceModule() {
           <torusGeometry
             args={[
               1.405,
-              0.035,
-              10,
-              64
+              0.045,
+              12,
+              72
             ]}
           />
 
           <meshStandardMaterial
-            color="#676d70"
-            metalness={0.72}
-            roughness={0.34}
+            color="#454b4e"
+            metalness={0.92}
+            roughness={0.21}
           />
         </mesh>
       ))}
 
 
-      {/* TOP AVIONICS BOX */}
+      {/* FRONT HEAVY COLLAR */}
+
       <mesh
         position={[
-          -0.55,
-          1.28,
-          -0.55
+          0,
+          0,
+          -2.37
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
         ]}
       >
-        <boxGeometry
+        <cylinderGeometry
           args={[
-            0.38,
+            1.43,
+            1.43,
+            0.20,
+            72
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#575d60"
+          metalness={0.91}
+          roughness={0.22}
+        />
+      </mesh>
+
+
+      <mesh
+        position={[
+          0,
+          0,
+          -2.45
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
+        <torusGeometry
+          args={[
+            1.42,
+            0.10,
+            16,
+            72
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#b0b4b5"
+          metalness={0.94}
+          roughness={0.17}
+        />
+      </mesh>
+
+
+      {/* REAR ENGINE CONNECTION */}
+
+      <mesh
+        position={[
+          0,
+          0,
+          2.38
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
+        <cylinderGeometry
+          args={[
+            1.42,
+            1.42,
             0.18,
-            0.42
+            72
           ]}
         />
 
         <meshStandardMaterial
-          color="#4b5053"
-          metalness={0.72}
-          roughness={0.35}
+          color="#464c4f"
+          metalness={0.90}
+          roughness={0.23}
         />
       </mesh>
 
 
-      {/* TOP AVIONICS BOX 2 */}
+      {/* SMALL TOP HARDWARE */}
+
       <mesh
         position={[
-          0.58,
-          1.28,
-          0.45
-        ]}
-      >
-        <boxGeometry
-          args={[
-            0.42,
-            0.18,
-            0.46
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#44494c"
-          metalness={0.72}
-          roughness={0.35}
-        />
-      </mesh>
-
-
-      {/* SIDE EQUIPMENT */}
-      <mesh
-        position={[
-          -1.38,
-          -0.25,
-          -0.55
-        ]}
-      >
-        <boxGeometry
-          args={[
-            0.19,
-            0.45,
-            0.58
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#565c5f"
-          metalness={0.72}
-          roughness={0.36}
-        />
-      </mesh>
-
-
-      {/* SIDE EQUIPMENT RIGHT */}
-      <mesh
-        position={[
+          -0.70,
           1.38,
-          0.18,
+          -1.12
+        ]}
+      >
+        <boxGeometry
+          args={[
+            0.34,
+            0.09,
+            0.35
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#343a3d"
+          metalness={0.88}
+          roughness={0.24}
+        />
+      </mesh>
+
+
+      <mesh
+        position={[
+          0.38,
+          1.39,
+          -0.45
+        ]}
+      >
+        <boxGeometry
+          args={[
+            0.32,
+            0.08,
+            0.32
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#555b5e"
+          metalness={0.86}
+          roughness={0.25}
+        />
+      </mesh>
+
+
+      <mesh
+        position={[
+          0.82,
+          1.35,
           0.65
         ]}
       >
         <boxGeometry
           args={[
-            0.19,
-            0.46,
-            0.56
+            0.28,
+            0.08,
+            0.30
           ]}
         />
 
         <meshStandardMaterial
-          color="#565c5f"
-          metalness={0.72}
-          roughness={0.36}
+          color="#373d40"
+          metalness={0.88}
+          roughness={0.23}
         />
       </mesh>
+
     </group>
   )
 }

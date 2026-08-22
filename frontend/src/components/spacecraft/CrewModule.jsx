@@ -6,14 +6,10 @@ import { useFrame } from "@react-three/fiber"
 function CapsuleShell({
   warning = false
 }) {
-
   const materialRef = useRef()
 
-
   const geometry = useMemo(() => {
-
     const points = [
-
       new THREE.Vector2(0.62, -1.55),
 
       new THREE.Vector2(0.76, -1.35),
@@ -26,84 +22,63 @@ function CapsuleShell({
 
       new THREE.Vector2(1.82, 0.30),
       new THREE.Vector2(1.82, 0.45)
-
     ]
 
     return new THREE.LatheGeometry(
       points,
-      64
+      72
     )
-
   }, [])
 
 
   useFrame(({ clock }) => {
-
     if (!materialRef.current) {
       return
     }
 
-
     if (warning) {
-
       const pulse =
         (Math.sin(
-          clock.elapsedTime * 4.5
+          clock.elapsedTime * 4.8
         ) + 1) / 2
 
-
       materialRef.current.color.set(
-        "#e7dfad"
+        "#ded9b7"
       )
-
 
       materialRef.current.emissive.set(
-        "#e0b900"
+        "#b89500"
       )
 
-
       materialRef.current.emissiveIntensity =
-        0.08 + pulse * 0.42
-
+        0.06 + pulse * 0.25
     }
 
     else {
-
       materialRef.current.color.set(
-        "#d6d7d4"
+        "#d2d4d3"
       )
-
 
       materialRef.current.emissive.set(
         "#000000"
       )
 
-
       materialRef.current.emissiveIntensity =
         0
-
     }
-
   })
 
 
   return (
-
     <mesh geometry={geometry}>
-
       <meshStandardMaterial
         ref={materialRef}
-        color="#d6d7d4"
-        emissive="#000000"
-        emissiveIntensity={0}
-        metalness={0.42}
-        roughness={0.43}
+        color="#d2d4d3"
+        metalness={0.60}
+        roughness={0.34}
       />
-
     </mesh>
-
   )
-
 }
 
 
@@ -113,9 +88,7 @@ function Window({
   rotation = [0, 0, 0],
   scale = 1
 }) {
-
   return (
-
     <group
       position={position}
       rotation={rotation}
@@ -123,21 +96,19 @@ function Window({
     >
 
       <mesh>
-
         <boxGeometry
           args={[
-            0.34,
+            0.36,
             0.24,
-            0.055
+            0.07
           ]}
         />
 
         <meshStandardMaterial
-          color="#202529"
-          metalness={0.85}
-          roughness={0.18}
+          color="#15191c"
+          metalness={0.92}
+          roughness={0.16}
         />
-
       </mesh>
 
 
@@ -145,32 +116,28 @@ function Window({
         position={[
           0,
           0,
-          0.04
+          0.045
         ]}
       >
-
         <boxGeometry
           args={[
-            0.26,
+            0.27,
             0.16,
-            0.03
+            0.025
           ]}
         />
 
         <meshPhysicalMaterial
-          color="#07192c"
-          emissive="#03101b"
-          emissiveIntensity={0.4}
-          metalness={0.7}
-          roughness={0.07}
+          color="#061420"
+          emissive="#020b12"
+          emissiveIntensity={0.3}
+          metalness={0.80}
+          roughness={0.05}
         />
-
       </mesh>
 
     </group>
-
   )
-
 }
 
 
@@ -178,39 +145,29 @@ function Window({
 function WarningIndicator({
   warning
 }) {
-
-  const lightMaterialRef = useRef()
-  const pointLightRef = useRef()
+  const materialRef = useRef()
+  const lightRef = useRef()
 
 
   useFrame(({ clock }) => {
-
     if (!warning) {
       return
     }
-
 
     const pulse =
       (Math.sin(
         clock.elapsedTime * 6
       ) + 1) / 2
 
-
-    if (lightMaterialRef.current) {
-
-      lightMaterialRef.current.emissiveIntensity =
-        1.2 + pulse * 4
-
+    if (materialRef.current) {
+      materialRef.current.emissiveIntensity =
+        1 + pulse * 4
     }
 
-
-    if (pointLightRef.current) {
-
-      pointLightRef.current.intensity =
-        0.3 + pulse * 1.8
-
+    if (lightRef.current) {
+      lightRef.current.intensity =
+        0.3 + pulse * 1.5
     }
-
   })
 
 
@@ -220,47 +177,42 @@ function WarningIndicator({
 
 
   return (
-
     <group
       position={[
-        1.43,
+        1.38,
         -0.10,
-        0.88
+        0.90
       ]}
     >
 
       <mesh>
-
         <sphereGeometry
           args={[
-            0.15,
-            24,
-            24
+            0.13,
+            20,
+            20
           ]}
         />
 
         <meshStandardMaterial
-          ref={lightMaterialRef}
-          color="#ffe36a"
+          ref={materialRef}
+          color="#ffe16a"
           emissive="#ffc400"
           emissiveIntensity={3}
         />
-
       </mesh>
 
 
       <pointLight
-        ref={pointLightRef}
-        color="#ffd84a"
-        intensity={1.2}
-        distance={2.3}
+        ref={lightRef}
+        color="#ffd94c"
+        intensity={1}
+        distance={2}
         decay={2}
       />
 
     </group>
-
   )
-
 }
 
 
@@ -269,9 +221,7 @@ export default function CrewModule({
   onSelect,
   warning = false
 }) {
-
   return (
-
     <group
       position={[
         0,
@@ -284,13 +234,11 @@ export default function CrewModule({
         0
       ]}
       onClick={(event) => {
-
         event.stopPropagation()
 
         if (onSelect) {
           onSelect()
         }
-
       }}
     >
 
@@ -299,98 +247,116 @@ export default function CrewModule({
       />
 
 
+      {/* LONG SOLID SERVICE-TO-CREW ADAPTER */}
+
       <mesh
         position={[
           0,
-          0.57,
-          0
-        ]}
-        rotation={[
-          Math.PI / 2,
-          0,
+          0.96,
           0
         ]}
       >
-
         <cylinderGeometry
           args={[
-            1.80,
-            1.72,
-            0.42,
-            64
+            1.44,
+            1.82,
+            1.10,
+            72
           ]}
         />
 
         <meshStandardMaterial
-          color="#34383a"
-          metalness={0.82}
-          roughness={0.28}
-        />
-
-      </mesh>
-
-
-      <mesh
-        position={[
-          0,
-          0.42,
-          0
-        ]}
-        rotation={[
-          Math.PI / 2,
-          0,
-          0
-        ]}
-      >
-
-        <torusGeometry
-          args={[
-            1.79,
-            0.095,
-            16,
-            64
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#727779"
-          metalness={0.90}
-          roughness={0.20}
-        />
-
-      </mesh>
-
-
-      <mesh
-        position={[
-          0,
-          0.67,
-          0
-        ]}
-        rotation={[
-          Math.PI / 2,
-          0,
-          0
-        ]}
-      >
-
-        <torusGeometry
-          args={[
-            1.69,
-            0.075,
-            16,
-            64
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#202427"
+          color="#858b8d"
           metalness={0.88}
           roughness={0.24}
         />
-
       </mesh>
 
+
+      {/* LARGE SOLID FRONT COLLAR */}
+
+      <mesh
+        position={[
+          0,
+          0.45,
+          0
+        ]}
+      >
+        <cylinderGeometry
+          args={[
+            1.88,
+            1.88,
+            0.20,
+            72
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#b9bcbd"
+          metalness={0.94}
+          roughness={0.17}
+        />
+      </mesh>
+
+
+      {/* DARK SEAL */}
+
+      <mesh
+        position={[
+          0,
+          0.52,
+          0
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
+        <torusGeometry
+          args={[
+            1.78,
+            0.065,
+            16,
+            72
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#252a2d"
+          metalness={0.92}
+          roughness={0.19}
+        />
+      </mesh>
+
+
+      {/* REAR METALLIC BAND */}
+
+      <mesh
+        position={[
+          0,
+          1.40,
+          0
+        ]}
+      >
+        <cylinderGeometry
+          args={[
+            1.47,
+            1.47,
+            0.16,
+            72
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#595f62"
+          metalness={0.91}
+          roughness={0.22}
+        />
+      </mesh>
+
+
+      {/* FLAT FRONT FACE */}
 
       <mesh
         position={[
@@ -398,35 +364,30 @@ export default function CrewModule({
           -1.56,
           0
         ]}
-        rotation={[
-          Math.PI / 2,
-          0,
-          0
-        ]}
       >
-
         <cylinderGeometry
           args={[
             0.62,
             0.62,
-            0.10,
+            0.11,
             48
           ]}
         />
 
         <meshStandardMaterial
-          color="#c8cac8"
-          metalness={0.48}
-          roughness={0.38}
+          color="#d0d1ce"
+          metalness={0.64}
+          roughness={0.30}
         />
-
       </mesh>
 
+
+      {/* OUTER FRONT RING */}
 
       <mesh
         position={[
           0,
-          -1.62,
+          -1.63,
           0
         ]}
         rotation={[
@@ -435,60 +396,55 @@ export default function CrewModule({
           0
         ]}
       >
-
         <torusGeometry
           args={[
             0.48,
-            0.075,
+            0.08,
             16,
             48
           ]}
         />
 
         <meshStandardMaterial
-          color="#484d50"
-          metalness={0.92}
-          roughness={0.17}
+          color="#363b3e"
+          metalness={0.95}
+          roughness={0.15}
         />
-
       </mesh>
 
+
+      {/* BLACK DOCKING PORT */}
 
       <mesh
         position={[
           0,
-          -1.68,
-          0
-        ]}
-        rotation={[
-          Math.PI / 2,
-          0,
+          -1.70,
           0
         ]}
       >
-
         <cylinderGeometry
           args={[
-            0.34,
-            0.34,
+            0.32,
+            0.32,
             0.14,
             40
           ]}
         />
 
         <meshStandardMaterial
-          color="#292d30"
-          metalness={0.9}
-          roughness={0.20}
+          color="#202426"
+          metalness={0.95}
+          roughness={0.18}
         />
-
       </mesh>
 
+
+      {/* SILVER INNER DOCKING COLLAR */}
 
       <mesh
         position={[
           0,
-          -1.76,
+          -1.77,
           0
         ]}
         rotation={[
@@ -497,30 +453,113 @@ export default function CrewModule({
           0
         ]}
       >
+        <torusGeometry
+          args={[
+            0.265,
+            0.065,
+            18,
+            48
+          ]}
+        />
 
+        <meshStandardMaterial
+          color="#e3e5e3"
+          metalness={0.82}
+          roughness={0.23}
+        />
+      </mesh>
+
+
+      {/* SECOND SILVER DETAIL RING */}
+
+      <mesh
+        position={[
+          0,
+          -1.79,
+          0
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
+        <torusGeometry
+          args={[
+            0.205,
+            0.025,
+            14,
+            40
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#aeb3b5"
+          metalness={0.90}
+          roughness={0.18}
+        />
+      </mesh>
+
+
+      {/* INNER BLACK DOCKING CENTER */}
+
+      <mesh
+        position={[
+          0,
+          -1.81,
+          0
+        ]}
+      >
         <cylinderGeometry
           args={[
-            0.21,
-            0.21,
+            0.165,
+            0.165,
             0.08,
             40
           ]}
         />
 
         <meshStandardMaterial
-          color="#080a0c"
-          metalness={0.6}
-          roughness={0.25}
+          color="#07090b"
+          metalness={0.72}
+          roughness={0.22}
         />
-
       </mesh>
 
 
+      {/* SMALL INNER SILVER HUB */}
+
+      <mesh
+        position={[
+          0,
+          -1.86,
+          0
+        ]}
+      >
+        <cylinderGeometry
+          args={[
+            0.07,
+            0.07,
+            0.055,
+            32
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#d9dcda"
+          metalness={0.90}
+          roughness={0.18}
+        />
+      </mesh>
+
+
+      {/* WINDOWS */}
+
       <Window
         position={[
-          -0.70,
-          -0.45,
-          1.25
+          -0.69,
+          -0.48,
+          1.26
         ]}
         rotation={[
           Math.PI / 2,
@@ -532,9 +571,9 @@ export default function CrewModule({
 
       <Window
         position={[
-          0.70,
-          -0.45,
-          1.25
+          0.69,
+          -0.48,
+          1.26
         ]}
         rotation={[
           Math.PI / 2,
@@ -546,142 +585,32 @@ export default function CrewModule({
 
       <Window
         position={[
-          -1.15,
-          -0.02,
-          1.05
+          -1.13,
+          -0.01,
+          1.04
         ]}
         rotation={[
           Math.PI / 2,
           0,
-          0.30
+          0.31
         ]}
-        scale={0.80}
+        scale={0.78}
       />
 
 
       <Window
         position={[
-          1.15,
-          -0.02,
-          1.05
+          1.13,
+          -0.01,
+          1.04
         ]}
         rotation={[
           Math.PI / 2,
           0,
-          -0.30
+          -0.31
         ]}
-        scale={0.80}
+        scale={0.78}
       />
-
-
-      <mesh
-        position={[
-          -1.36,
-          0.08,
-          0.55
-        ]}
-      >
-
-        <boxGeometry
-          args={[
-            0.12,
-            0.28,
-            0.25
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#34393c"
-          metalness={0.75}
-          roughness={0.28}
-        />
-
-      </mesh>
-
-
-      <mesh
-        position={[
-          1.36,
-          0.08,
-          0.55
-        ]}
-      >
-
-        <boxGeometry
-          args={[
-            0.12,
-            0.28,
-            0.25
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#34393c"
-          metalness={0.75}
-          roughness={0.28}
-        />
-
-      </mesh>
-
-
-      <mesh
-        position={[
-          1.48,
-          0.15,
-          0.62
-        ]}
-        rotation={[
-          0,
-          0,
-          0.9
-        ]}
-      >
-
-        <coneGeometry
-          args={[
-            0.09,
-            0.22,
-            18
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#181c1f"
-          metalness={0.92}
-          roughness={0.17}
-        />
-
-      </mesh>
-
-
-      <mesh
-        position={[
-          -1.48,
-          0.15,
-          0.62
-        ]}
-        rotation={[
-          0,
-          0,
-          -0.9
-        ]}
-      >
-
-        <coneGeometry
-          args={[
-            0.09,
-            0.22,
-            18
-          ]}
-        />
-
-        <meshStandardMaterial
-          color="#181c1f"
-          metalness={0.92}
-          roughness={0.17}
-        />
-
-      </mesh>
 
 
       <WarningIndicator
@@ -689,7 +618,5 @@ export default function CrewModule({
       />
 
     </group>
-
   )
-
 }

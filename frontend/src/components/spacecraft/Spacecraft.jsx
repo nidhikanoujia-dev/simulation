@@ -21,7 +21,6 @@ function Spacecraft({
 
 
   return (
-
     <group
       rotation={[
         -0.10,
@@ -165,9 +164,7 @@ function Spacecraft({
       />
 
     </group>
-
   )
-
 }
 
 
