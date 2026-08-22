@@ -1,9 +1,81 @@
 import * as THREE from "three"
+import { useRef } from "react"
+import { useFrame } from "@react-three/fiber"
 
 
 export default function Communication({
-  onSelect
+  onSelect,
+  warning = false
 }) {
+
+  const warningMaterialRef = useRef()
+  const warningLightRef = useRef()
+
+
+  useFrame(({ clock }) => {
+
+    if (!warning) {
+
+      if (warningMaterialRef.current) {
+
+        warningMaterialRef.current.color.set(
+          "#8effbd"
+        )
+
+        warningMaterialRef.current.emissive.set(
+          "#00ff88"
+        )
+
+        warningMaterialRef.current.emissiveIntensity =
+          1
+
+      }
+
+
+      if (warningLightRef.current) {
+
+        warningLightRef.current.intensity =
+          0
+
+      }
+
+
+      return
+
+    }
+
+
+    const pulse =
+      (Math.sin(
+        clock.elapsedTime * 6
+      ) + 1) / 2
+
+
+    if (warningMaterialRef.current) {
+
+      warningMaterialRef.current.color.set(
+        "#ffe36a"
+      )
+
+      warningMaterialRef.current.emissive.set(
+        "#ffc400"
+      )
+
+      warningMaterialRef.current.emissiveIntensity =
+        1 + pulse * 4
+
+    }
+
+
+    if (warningLightRef.current) {
+
+      warningLightRef.current.intensity =
+        0.3 + pulse * 1.8
+
+    }
+
+  })
+
 
   return (
 
@@ -24,8 +96,8 @@ export default function Communication({
       }}
     >
 
-      {/* ANTENNA BASE */}
       <mesh>
+
         <cylinderGeometry
           args={[
             0.16,
@@ -40,10 +112,10 @@ export default function Communication({
           metalness={0.9}
           roughness={0.22}
         />
+
       </mesh>
 
 
-      {/* MAST */}
       <mesh
         position={[
           0,
@@ -51,6 +123,7 @@ export default function Communication({
           0
         ]}
       >
+
         <cylinderGeometry
           args={[
             0.035,
@@ -65,10 +138,10 @@ export default function Communication({
           metalness={0.92}
           roughness={0.2}
         />
+
       </mesh>
 
 
-      {/* DISH */}
       <mesh
         position={[
           0,
@@ -81,6 +154,7 @@ export default function Communication({
           0
         ]}
       >
+
         <coneGeometry
           args={[
             0.30,
@@ -97,10 +171,10 @@ export default function Communication({
           roughness={0.24}
           side={THREE.DoubleSide}
         />
+
       </mesh>
 
 
-      {/* DISH CENTER */}
       <mesh
         position={[
           0,
@@ -108,6 +182,7 @@ export default function Communication({
           0
         ]}
       >
+
         <sphereGeometry
           args={[
             0.055,
@@ -120,10 +195,10 @@ export default function Communication({
           color="#25292c"
           metalness={0.85}
         />
+
       </mesh>
 
 
-      {/* ANTENNA TIP */}
       <mesh
         position={[
           0,
@@ -131,21 +206,40 @@ export default function Communication({
           0
         ]}
       >
+
         <sphereGeometry
           args={[
-            0.035,
-            12,
-            12
+            0.075,
+            18,
+            18
           ]}
         />
 
         <meshStandardMaterial
+          ref={warningMaterialRef}
           color="#8effbd"
           emissive="#00ff88"
           emissiveIntensity={1}
         />
+
       </mesh>
 
+
+      <pointLight
+        ref={warningLightRef}
+        position={[
+          0,
+          1.02,
+          0
+        ]}
+        color="#ffd84a"
+        intensity={0}
+        distance={2}
+        decay={2}
+      />
+
     </group>
+
   )
+
 }

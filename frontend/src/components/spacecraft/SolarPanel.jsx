@@ -1,3 +1,7 @@
+import { useRef } from "react"
+import { useFrame } from "@react-three/fiber"
+
+
 function SolarPanel({
   position,
   rotation = [0, 0, 0],
@@ -5,10 +9,77 @@ function SolarPanel({
   powerFailure = false
 }) {
 
-  const panelColor =
-    powerFailure
-      ? "#351010"
-      : "#101a3d"
+  const panelMaterialRef = useRef()
+  const failureMaterialRef = useRef()
+  const failureLightRef = useRef()
+
+
+  useFrame(({ clock }) => {
+
+    if (!panelMaterialRef.current) {
+      return
+    }
+
+
+    if (!powerFailure) {
+
+      panelMaterialRef.current.color.set(
+        "#101a3d"
+      )
+
+      panelMaterialRef.current.emissive.set(
+        "#000000"
+      )
+
+      panelMaterialRef.current.emissiveIntensity =
+        0
+
+
+      if (failureLightRef.current) {
+        failureLightRef.current.intensity = 0
+      }
+
+
+      return
+
+    }
+
+
+    const pulse =
+      (Math.sin(
+        clock.elapsedTime * 6
+      ) + 1) / 2
+
+
+    panelMaterialRef.current.color.set(
+      "#351010"
+    )
+
+    panelMaterialRef.current.emissive.set(
+      "#8a0000"
+    )
+
+    panelMaterialRef.current.emissiveIntensity =
+      0.25 + pulse * 1.3
+
+
+    if (failureMaterialRef.current) {
+
+      failureMaterialRef.current.emissiveIntensity =
+        1 + pulse * 4.5
+
+    }
+
+
+    if (failureLightRef.current) {
+
+      failureLightRef.current.intensity =
+        0.2 + pulse * 2.5
+
+    }
+
+  })
+
 
   const gridColor =
     powerFailure
@@ -17,6 +88,7 @@ function SolarPanel({
 
 
   return (
+
     <group
       position={position}
       rotation={rotation}
@@ -31,8 +103,6 @@ function SolarPanel({
       }}
     >
 
-      {/* SUPPORT ARM */}
-
       <mesh
         position={[
           0.60,
@@ -40,6 +110,7 @@ function SolarPanel({
           0
         ]}
       >
+
         <boxGeometry
           args={[
             1.20,
@@ -57,10 +128,9 @@ function SolarPanel({
           metalness={0.86}
           roughness={0.25}
         />
+
       </mesh>
 
-
-      {/* ROTATION JOINT */}
 
       <mesh
         position={[
@@ -69,6 +139,7 @@ function SolarPanel({
           0
         ]}
       >
+
         <sphereGeometry
           args={[
             0.15,
@@ -86,12 +157,9 @@ function SolarPanel({
           metalness={0.85}
           roughness={0.24}
         />
+
       </mesh>
 
-
-      {/* ======================================
-          SLIGHTLY LARGER SOLAR PANEL
-      ====================================== */}
 
       <mesh
         position={[
@@ -100,6 +168,7 @@ function SolarPanel({
           0
         ]}
       >
+
         <boxGeometry
           args={[
             2.35,
@@ -109,24 +178,16 @@ function SolarPanel({
         />
 
         <meshStandardMaterial
-          color={panelColor}
-          emissive={
-            powerFailure
-              ? "#450000"
-              : "#000000"
-          }
-          emissiveIntensity={
-            powerFailure
-              ? 0.7
-              : 0
-          }
+          ref={panelMaterialRef}
+          color="#101a3d"
+          emissive="#000000"
+          emissiveIntensity={0}
           metalness={0.42}
           roughness={0.27}
         />
+
       </mesh>
 
-
-      {/* VERTICAL CELL LINES */}
 
       {[
         -0.90,
@@ -146,6 +207,7 @@ function SolarPanel({
             0
           ]}
         >
+
           <boxGeometry
             args={[
               0.014,
@@ -167,12 +229,11 @@ function SolarPanel({
                 : 0
             }
           />
+
         </mesh>
 
       ))}
 
-
-      {/* HORIZONTAL CELL LINES */}
 
       {[
         -0.42,
@@ -190,6 +251,7 @@ function SolarPanel({
             offset
           ]}
         >
+
           <boxGeometry
             args={[
               2.30,
@@ -211,41 +273,63 @@ function SolarPanel({
                 : 0
             }
           />
+
         </mesh>
 
       ))}
 
 
-      {/* POWER FAILURE LIGHT */}
-
       {powerFailure && (
 
-        <mesh
-          position={[
-            2.35,
-            0.12,
-            0
-          ]}
-        >
-          <sphereGeometry
-            args={[
-              0.085,
-              18,
-              18
+        <>
+
+          <mesh
+            position={[
+              2.35,
+              0.13,
+              0
             ]}
+          >
+
+            <sphereGeometry
+              args={[
+                0.12,
+                22,
+                22
+              ]}
+            />
+
+            <meshStandardMaterial
+              ref={failureMaterialRef}
+              color="#ff3030"
+              emissive="#ff0000"
+              emissiveIntensity={3}
+            />
+
+          </mesh>
+
+
+          <pointLight
+            ref={failureLightRef}
+            position={[
+              2.35,
+              0.18,
+              0
+            ]}
+            color="#ff2222"
+            intensity={1}
+            distance={2.4}
+            decay={2}
           />
 
-          <meshStandardMaterial
-            color="#ff3030"
-            emissive="#ff0000"
-            emissiveIntensity={3}
-          />
-        </mesh>
+        </>
 
       )}
 
     </group>
+
   )
+
 }
 
 

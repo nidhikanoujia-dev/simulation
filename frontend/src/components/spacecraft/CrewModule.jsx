@@ -1,33 +1,21 @@
 import * as THREE from "three"
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
+import { useFrame } from "@react-three/fiber"
 
 
-function CapsuleShell() {
+function CapsuleShell({
+  warning = false
+}) {
+
+  const materialRef = useRef()
+
 
   const geometry = useMemo(() => {
 
-    /*
-      TRUNCATED-CONE CREW CAPSULE
-
-      FLAT SMALL FRONT
-             ↓
-          ________
-         /        \
-        /          \
-       /            \
-      /              \
-     |________________|
-
-      The radius increases almost linearly,
-      giving us the triangular/frustum shape.
-    */
-
     const points = [
 
-      // SMALL FLAT FRONT
       new THREE.Vector2(0.62, -1.55),
 
-      // STRAIGHT TAPER
       new THREE.Vector2(0.76, -1.35),
       new THREE.Vector2(0.94, -1.10),
       new THREE.Vector2(1.12, -0.85),
@@ -36,7 +24,6 @@ function CapsuleShell() {
       new THREE.Vector2(1.64, -0.10),
       new THREE.Vector2(1.78, 0.15),
 
-      // LARGE REAR EDGE
       new THREE.Vector2(1.82, 0.30),
       new THREE.Vector2(1.82, 0.45)
 
@@ -50,12 +37,65 @@ function CapsuleShell() {
   }, [])
 
 
+  useFrame(({ clock }) => {
+
+    if (!materialRef.current) {
+      return
+    }
+
+
+    if (warning) {
+
+      const pulse =
+        (Math.sin(
+          clock.elapsedTime * 4.5
+        ) + 1) / 2
+
+
+      materialRef.current.color.set(
+        "#e7dfad"
+      )
+
+
+      materialRef.current.emissive.set(
+        "#e0b900"
+      )
+
+
+      materialRef.current.emissiveIntensity =
+        0.08 + pulse * 0.42
+
+    }
+
+    else {
+
+      materialRef.current.color.set(
+        "#d6d7d4"
+      )
+
+
+      materialRef.current.emissive.set(
+        "#000000"
+      )
+
+
+      materialRef.current.emissiveIntensity =
+        0
+
+    }
+
+  })
+
+
   return (
 
     <mesh geometry={geometry}>
 
       <meshStandardMaterial
+        ref={materialRef}
         color="#d6d7d4"
+        emissive="#000000"
+        emissiveIntensity={0}
         metalness={0.42}
         roughness={0.43}
       />
@@ -82,8 +122,6 @@ function Window({
       scale={scale}
     >
 
-      {/* WINDOW FRAME */}
-
       <mesh>
 
         <boxGeometry
@@ -102,8 +140,6 @@ function Window({
 
       </mesh>
 
-
-      {/* DARK GLASS */}
 
       <mesh
         position={[
@@ -139,8 +175,99 @@ function Window({
 
 
 
+function WarningIndicator({
+  warning
+}) {
+
+  const lightMaterialRef = useRef()
+  const pointLightRef = useRef()
+
+
+  useFrame(({ clock }) => {
+
+    if (!warning) {
+      return
+    }
+
+
+    const pulse =
+      (Math.sin(
+        clock.elapsedTime * 6
+      ) + 1) / 2
+
+
+    if (lightMaterialRef.current) {
+
+      lightMaterialRef.current.emissiveIntensity =
+        1.2 + pulse * 4
+
+    }
+
+
+    if (pointLightRef.current) {
+
+      pointLightRef.current.intensity =
+        0.3 + pulse * 1.8
+
+    }
+
+  })
+
+
+  if (!warning) {
+    return null
+  }
+
+
+  return (
+
+    <group
+      position={[
+        1.43,
+        -0.10,
+        0.88
+      ]}
+    >
+
+      <mesh>
+
+        <sphereGeometry
+          args={[
+            0.15,
+            24,
+            24
+          ]}
+        />
+
+        <meshStandardMaterial
+          ref={lightMaterialRef}
+          color="#ffe36a"
+          emissive="#ffc400"
+          emissiveIntensity={3}
+        />
+
+      </mesh>
+
+
+      <pointLight
+        ref={pointLightRef}
+        color="#ffd84a"
+        intensity={1.2}
+        distance={2.3}
+        decay={2}
+      />
+
+    </group>
+
+  )
+
+}
+
+
+
 export default function CrewModule({
-  onSelect
+  onSelect,
+  warning = false
 }) {
 
   return (
@@ -167,112 +294,103 @@ export default function CrewModule({
       }}
     >
 
-
-      {/* ========================================
-          TRUNCATED CONE CREW CAPSULE
-      ======================================== */}
-
-      <CapsuleShell />
+      <CapsuleShell
+        warning={warning}
+      />
 
 
-      {/* ========================================
-    CAPSULE → SERVICE MODULE CONNECTION
-    Fills the hollow-looking gap
-======================================== */}
+      <mesh
+        position={[
+          0,
+          0.57,
+          0
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
 
-{/* MAIN CONNECTOR COLLAR */}
-<mesh
-  position={[
-    0,
-    0.57,
-    0
-  ]}
-  rotation={[
-    Math.PI / 2,
-    0,
-    0
-  ]}
->
-  <cylinderGeometry
-    args={[
-      1.80,
-      1.72,
-      0.42,
-      64
-    ]}
-  />
+        <cylinderGeometry
+          args={[
+            1.80,
+            1.72,
+            0.42,
+            64
+          ]}
+        />
 
-  <meshStandardMaterial
-    color="#34383a"
-    metalness={0.82}
-    roughness={0.28}
-  />
-</mesh>
+        <meshStandardMaterial
+          color="#34383a"
+          metalness={0.82}
+          roughness={0.28}
+        />
+
+      </mesh>
 
 
-{/* OUTER METALLIC CONNECTION RING */}
-<mesh
-  position={[
-    0,
-    0.42,
-    0
-  ]}
-  rotation={[
-    Math.PI / 2,
-    0,
-    0
-  ]}
->
-  <torusGeometry
-    args={[
-      1.79,
-      0.095,
-      16,
-      64
-    ]}
-  />
+      <mesh
+        position={[
+          0,
+          0.42,
+          0
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
 
-  <meshStandardMaterial
-    color="#727779"
-    metalness={0.90}
-    roughness={0.20}
-  />
-</mesh>
+        <torusGeometry
+          args={[
+            1.79,
+            0.095,
+            16,
+            64
+          ]}
+        />
 
+        <meshStandardMaterial
+          color="#727779"
+          metalness={0.90}
+          roughness={0.20}
+        />
 
-{/* INNER DARK STRUCTURAL RING */}
-<mesh
-  position={[
-    0,
-    0.67,
-    0
-  ]}
-  rotation={[
-    Math.PI / 2,
-    0,
-    0
-  ]}
->
-  <torusGeometry
-    args={[
-      1.69,
-      0.075,
-      16,
-      64
-    ]}
-  />
-
-  <meshStandardMaterial
-    color="#202427"
-    metalness={0.88}
-    roughness={0.24}
-  />
-</mesh>
+      </mesh>
 
 
-      {/* ========================================
-          FLAT FRONT FACE
-      ======================================== */}
+      <mesh
+        position={[
+          0,
+          0.67,
+          0
+        ]}
+        rotation={[
+          Math.PI / 2,
+          0,
+          0
+        ]}
+      >
+
+        <torusGeometry
+          args={[
+            1.69,
+            0.075,
+            16,
+            64
+          ]}
+        />
+
+        <meshStandardMaterial
+          color="#202427"
+          metalness={0.88}
+          roughness={0.24}
+        />
+
+      </mesh>
+
 
       <mesh
         position={[
@@ -305,10 +423,6 @@ export default function CrewModule({
       </mesh>
 
 
-      {/* ========================================
-          FRONT METALLIC RING
-      ======================================== */}
-
       <mesh
         position={[
           0,
@@ -339,10 +453,6 @@ export default function CrewModule({
 
       </mesh>
 
-
-      {/* ========================================
-          DOCKING PORT
-      ======================================== */}
 
       <mesh
         position={[
@@ -375,8 +485,6 @@ export default function CrewModule({
       </mesh>
 
 
-      {/* DOCKING PORT INNER HOLE */}
-
       <mesh
         position={[
           0,
@@ -407,10 +515,6 @@ export default function CrewModule({
 
       </mesh>
 
-
-      {/* ========================================
-          WINDOWS
-      ======================================== */}
 
       <Window
         position={[
@@ -470,10 +574,6 @@ export default function CrewModule({
       />
 
 
-      {/* ========================================
-          SMALL HULL DETAILS
-      ======================================== */}
-
       <mesh
         position={[
           -1.36,
@@ -523,10 +623,6 @@ export default function CrewModule({
 
       </mesh>
 
-
-      {/* ========================================
-          RCS THRUSTERS
-      ======================================== */}
 
       <mesh
         position={[
@@ -586,6 +682,11 @@ export default function CrewModule({
         />
 
       </mesh>
+
+
+      <WarningIndicator
+        warning={warning}
+      />
 
     </group>
 

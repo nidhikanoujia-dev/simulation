@@ -5,6 +5,7 @@ import SpaceScene from "./components/scene/SpaceScene"
 
 
 const telemetry = {
+
   crew: {
     name: "CREW MODULE",
     status: "normal",
@@ -15,7 +16,7 @@ const telemetry = {
   },
 
   solar_left: {
-    name: "SOLAR ARRAY — LEFT",
+    name: "SOLAR ARRAY - LEFT",
     status: "normal",
     problem: "No Issues",
     oxygen: 0,
@@ -24,7 +25,7 @@ const telemetry = {
   },
 
   solar_right: {
-    name: "SOLAR ARRAY — RIGHT",
+    name: "SOLAR ARRAY - RIGHT",
     status: "normal",
     problem: "No Issues",
     oxygen: 0,
@@ -34,17 +35,17 @@ const telemetry = {
 
   life_support: {
     name: "LIFE SUPPORT",
-    status: "critical",
-    problem: "Oxygen Leak Detected",
-    oxygen: 62,
-    pressure: "LOW",
+    status: "normal",
+    problem: "No Issues",
+    oxygen: 98,
+    pressure: "NORMAL",
     temperature: 21
   },
 
   power: {
     name: "POWER SYSTEM",
-    status: "critical",
-    problem: "Power Generation Failure",
+    status: "normal",
+    problem: "No Issues",
     oxygen: 0,
     pressure: "N/A",
     temperature: 41
@@ -67,7 +68,9 @@ const telemetry = {
     pressure: "NORMAL",
     temperature: 48
   }
+
 }
+
 
 
 function HudCard({
@@ -75,7 +78,9 @@ function HudCard({
   lines,
   style
 }) {
+
   return (
+
     <div
       style={{
         position: "absolute",
@@ -93,6 +98,7 @@ function HudCard({
         ...style
       }}
     >
+
       <div
         style={{
           color: "#42ff9a",
@@ -104,21 +110,30 @@ function HudCard({
         {title}
       </div>
 
+
       {lines.map((line, index) => (
+
         <div key={index}>
           {line}
         </div>
+
       ))}
+
     </div>
+
   )
+
 }
 
 
+
 function App() {
+
   const [
     selectedSystem,
     setSelectedSystem
   ] = useState(null)
+
 
   const [
     simulation,
@@ -129,11 +144,12 @@ function App() {
   const oxygenLeak =
     simulation === "oxygen_leak"
 
+
   const powerFailure =
     simulation === "power_failure"
 
 
-  const isPowerAffectedSystem =
+  const isPowerCriticalSystem =
     powerFailure &&
     (
       selectedSystem === "power" ||
@@ -142,12 +158,32 @@ function App() {
     )
 
 
-  const isCriticalSystem =
+  const isPowerWarningSystem =
+    powerFailure &&
     (
-      selectedSystem === "life_support" &&
-      oxygenLeak
-    ) ||
-    isPowerAffectedSystem
+      selectedSystem === "communication" ||
+      selectedSystem === "life_support"
+    )
+
+
+  const isOxygenCriticalSystem =
+    oxygenLeak &&
+    selectedSystem === "life_support"
+
+
+  const isOxygenWarningSystem =
+    oxygenLeak &&
+    selectedSystem === "crew"
+
+
+  const isCriticalSystem =
+    isPowerCriticalSystem ||
+    isOxygenCriticalSystem
+
+
+  const isWarningSystem =
+    isPowerWarningSystem ||
+    isOxygenWarningSystem
 
 
   const selectedTelemetry =
@@ -156,23 +192,74 @@ function App() {
           ...telemetry[selectedSystem],
 
           status:
-            isPowerAffectedSystem
+            isCriticalSystem
               ? "critical"
-              : telemetry[selectedSystem].status,
+
+              : isWarningSystem
+              ? "warning"
+
+              : "normal",
 
           problem:
-            isPowerAffectedSystem
+            isPowerCriticalSystem
               ? "Power Generation Failure"
-              : telemetry[selectedSystem].problem
+
+              : isPowerWarningSystem &&
+                selectedSystem === "communication"
+              ? "Communication Operating on Backup Power"
+
+              : isPowerWarningSystem &&
+                selectedSystem === "life_support"
+              ? "Life Support Operating on Backup Power"
+
+              : isOxygenCriticalSystem
+              ? "Oxygen Leak Detected"
+
+              : isOxygenWarningSystem
+              ? "Cabin Atmosphere Affected"
+
+              : "No Issues",
+
+          oxygen:
+            isOxygenCriticalSystem
+              ? 62
+
+              : isOxygenWarningSystem
+              ? 88
+
+              : isPowerWarningSystem &&
+                selectedSystem === "life_support"
+              ? 94
+
+              : telemetry[selectedSystem].oxygen,
+
+          pressure:
+            isOxygenCriticalSystem
+              ? "LOW"
+
+              : isOxygenWarningSystem
+              ? "DROPPING"
+
+              : telemetry[selectedSystem].pressure,
+
+          temperature:
+            isPowerWarningSystem &&
+            selectedSystem === "life_support"
+              ? 24
+
+              : isPowerWarningSystem &&
+                selectedSystem === "communication"
+              ? 34
+
+              : telemetry[selectedSystem].temperature
         }
       : null
 
 
+
   const handleOxygenLeak = async () => {
+
     try {
-      console.log(
-        "OXYGEN LEAK CLICKED"
-      )
 
       const response = await fetch(
         "http://127.0.0.1:8000/api/scenario/oxygen-leak",
@@ -181,48 +268,46 @@ function App() {
         }
       )
 
-      console.log(
-        "OXYGEN STATUS:",
-        response.status
-      )
 
       if (!response.ok) {
+
         throw new Error(
           `Oxygen leak failed: ${response.status}`
         )
+
       }
 
-      const data =
-        await response.json()
 
-      console.log(
-        "OXYGEN RESPONSE:",
-        data
-      )
+      await response.json()
+
 
       setSimulation(
         "oxygen_leak"
       )
 
+
       setSelectedSystem(
         "life_support"
       )
+
     }
 
     catch (error) {
+
       console.error(
         "OXYGEN LEAK ERROR:",
         error
       )
+
     }
+
   }
 
 
+
   const handlePowerFailure = async () => {
+
     try {
-      console.log(
-        "POWER FAILURE CLICKED"
-      )
 
       const response = await fetch(
         "http://127.0.0.1:8000/api/scenario/power-failure",
@@ -231,66 +316,75 @@ function App() {
         }
       )
 
-      console.log(
-        "POWER FAILURE STATUS:",
-        response.status
-      )
 
       if (!response.ok) {
+
         throw new Error(
           `Power failure failed: ${response.status}`
         )
+
       }
 
-      const data =
-        await response.json()
 
-      console.log(
-        "POWER FAILURE RESPONSE:",
-        data
-      )
+      await response.json()
+
 
       setSimulation(
         "power_failure"
       )
 
+
       setSelectedSystem(
         "power"
       )
+
     }
 
     catch (error) {
+
       console.error(
         "POWER FAILURE ERROR:",
         error
       )
+
     }
+
   }
 
 
+
   const handleReset = async () => {
+
     try {
+
       await fetch(
         "http://127.0.0.1:8000/api/scenario/reset",
         {
           method: "POST"
         }
       )
+
     }
 
     catch (error) {
+
       console.error(
         "RESET ERROR:",
         error
       )
+
     }
+
 
     setSimulation(null)
     setSelectedSystem(null)
+
   }
 
 
+
   return (
+
     <div
       style={{
         width: "100vw",
@@ -330,12 +424,27 @@ function App() {
       <HudCard
         title="COMMS"
         lines={[
-          "Signal: 99%",
-          "Latency: 120 ms"
+          powerFailure
+            ? "Signal: 74%"
+            : "Signal: 99%",
+
+          powerFailure
+            ? "Latency: 380 ms"
+            : "Latency: 120 ms"
         ]}
         style={{
           top: "10%",
-          left: "9%"
+          left: "9%",
+
+          border:
+            powerFailure
+              ? "1px solid #ffd84a"
+              : "1px solid rgba(60,255,150,0.45)",
+
+          color:
+            powerFailure
+              ? "#ffe36a"
+              : "#a6ffd0"
         }}
       />
 
@@ -348,7 +457,7 @@ function App() {
             : "Output: 8.3 kW",
 
           powerFailure
-            ? "Battery: 31% ↓"
+            ? "Battery: 31%"
             : "Battery: 68%"
         ]}
         style={{
@@ -372,12 +481,20 @@ function App() {
         title="LIFE SUPPORT"
         lines={[
           oxygenLeak
-            ? "O₂: 62.0%"
-            : "O₂: 97.8%",
+            ? "O2: 62.0%"
+
+            : powerFailure
+            ? "O2: 94.0%"
+
+            : "O2: 97.8%",
 
           oxygenLeak
             ? "Pressure: LOW"
-            : "CO₂: 0.54%"
+
+            : powerFailure
+            ? "Backup Power: ACTIVE"
+
+            : "CO2: 0.54%"
         ]}
         style={{
           bottom: "18%",
@@ -386,11 +503,19 @@ function App() {
           border:
             oxygenLeak
               ? "1px solid #ff3c3c"
+
+              : powerFailure
+              ? "1px solid #ffd84a"
+
               : "1px solid rgba(60,255,150,0.45)",
 
           color:
             oxygenLeak
               ? "#ff7777"
+
+              : powerFailure
+              ? "#ffe36a"
+
               : "#a6ffd0"
         }}
       />
@@ -400,7 +525,7 @@ function App() {
         title="PROPULSION"
         lines={[
           "Fuel: 77%",
-          "Thermal: 39°C"
+          "Thermal: 39 C"
         ]}
         style={{
           bottom: "18%",
@@ -418,12 +543,13 @@ function App() {
 
 
       {selectedTelemetry && (
+
         <div
           style={{
             position: "absolute",
             top: "25px",
             right: "25px",
-            width: "260px",
+            width: "280px",
             padding: "17px",
             background: "rgba(3,13,12,0.91)",
             color: "#dbffee",
@@ -431,6 +557,10 @@ function App() {
             border:
               isCriticalSystem
                 ? "1px solid #ff4747"
+
+                : isWarningSystem
+                ? "1px solid #ffd84a"
+
                 : "1px solid rgba(60,255,150,0.40)",
 
             fontFamily: '"Courier New", monospace',
@@ -441,7 +571,15 @@ function App() {
 
           <div
             style={{
-              color: "#52ffad",
+              color:
+                isCriticalSystem
+                  ? "#ff6868"
+
+                  : isWarningSystem
+                  ? "#ffd84a"
+
+                  : "#52ffad",
+
               letterSpacing: "1px",
               marginBottom: "13px",
               fontWeight: "bold"
@@ -456,6 +594,7 @@ function App() {
               marginBottom: "10px"
             }}
           >
+
             STATUS:{" "}
 
             <span
@@ -463,15 +602,26 @@ function App() {
                 color:
                   isCriticalSystem
                     ? "#ff4d4d"
+
+                    : isWarningSystem
+                    ? "#ffd84a"
+
                     : "#58ff98"
               }}
             >
+
               {
                 isCriticalSystem
-                  ? "● CRITICAL"
-                  : "● NORMAL"
+                  ? "CRITICAL"
+
+                  : isWarningSystem
+                  ? "WARNING"
+
+                  : "NORMAL"
               }
+
             </span>
+
           </div>
 
 
@@ -481,18 +631,7 @@ function App() {
               marginBottom: "12px"
             }}
           >
-            {
-              selectedSystem === "life_support" &&
-              oxygenLeak
-
-                ? "⚠ Oxygen Leak Detected"
-
-                : isPowerAffectedSystem
-
-                ? "⚠ Power Generation Failure"
-
-                : "✓ No Issues"
-            }
+            {selectedTelemetry.problem}
           </div>
 
 
@@ -541,7 +680,43 @@ function App() {
                       <strong>
                         {
                           selectedTelemetry.temperature
-                        }°C
+                        } C
+                      </strong>
+                    </div>
+                  </>
+                )
+
+                : selectedSystem === "communication"
+                ? (
+                  <>
+                    <div>
+                      Signal:{" "}
+                      <strong>
+                        {
+                          powerFailure
+                            ? "74%"
+                            : "99%"
+                        }
+                      </strong>
+                    </div>
+
+                    <div>
+                      Latency:{" "}
+                      <strong>
+                        {
+                          powerFailure
+                            ? "380 ms"
+                            : "120 ms"
+                        }
+                      </strong>
+                    </div>
+
+                    <div>
+                      Temperature:{" "}
+                      <strong>
+                        {
+                          selectedTelemetry.temperature
+                        } C
                       </strong>
                     </div>
                   </>
@@ -552,30 +727,14 @@ function App() {
                     <div>
                       Oxygen:{" "}
                       <strong>
-                        {
-                          selectedSystem ===
-                            "life_support" &&
-                          oxygenLeak
-
-                            ? 62
-
-                            : selectedTelemetry.oxygen
-                        }%
+                        {selectedTelemetry.oxygen}%
                       </strong>
                     </div>
 
                     <div>
                       Pressure:{" "}
                       <strong>
-                        {
-                          selectedSystem ===
-                            "life_support" &&
-                          oxygenLeak
-
-                            ? "LOW"
-
-                            : selectedTelemetry.pressure
-                        }
+                        {selectedTelemetry.pressure}
                       </strong>
                     </div>
 
@@ -584,7 +743,7 @@ function App() {
                       <strong>
                         {
                           selectedTelemetry.temperature
-                        }°C
+                        } C
                       </strong>
                     </div>
                   </>
@@ -592,11 +751,15 @@ function App() {
             }
 
           </div>
+
         </div>
+
       )}
 
     </div>
+
   )
+
 }
 
 

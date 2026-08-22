@@ -11,14 +11,17 @@ function Spacecraft({
   onSystemSelect,
   simulation
 }) {
+
   const oxygenLeak =
     simulation === "oxygen_leak"
+
 
   const powerFailure =
     simulation === "power_failure"
 
 
   return (
+
     <group
       rotation={[
         -0.10,
@@ -27,34 +30,34 @@ function Spacecraft({
       ]}
       scale={0.82}
     >
-      {/* CREW CAPSULE */}
+
       <CrewModule
+        warning={oxygenLeak}
         onSelect={() =>
-          onSystemSelect("crew")
+          onSystemSelect(
+            "crew"
+          )
         }
       />
 
 
-      {/* LONG SERVICE MODULE */}
       <ServiceModule />
 
 
-      {/* EXISTING DETAILS */}
       <SurfaceDetails />
 
 
-      {/* BIG LIFE SUPPORT BOX */}
       <LifeSupport
+        active={oxygenLeak}
+        warning={powerFailure}
         onSelect={() =>
           onSystemSelect(
             "life_support"
           )
         }
-        active={oxygenLeak}
       />
 
 
-      {/* UPPER LEFT SOLAR PANEL */}
       <SolarPanel
         position={[
           -0.90,
@@ -77,7 +80,6 @@ function Spacecraft({
       />
 
 
-      {/* LOWER LEFT SOLAR PANEL */}
       <SolarPanel
         position={[
           -0.90,
@@ -100,7 +102,6 @@ function Spacecraft({
       />
 
 
-      {/* UPPER RIGHT SOLAR PANEL */}
       <SolarPanel
         position={[
           0.90,
@@ -123,7 +124,6 @@ function Spacecraft({
       />
 
 
-      {/* LOWER RIGHT SOLAR PANEL */}
       <SolarPanel
         position={[
           0.90,
@@ -146,8 +146,8 @@ function Spacecraft({
       />
 
 
-      {/* ANTENNA */}
       <Communication
+        warning={powerFailure}
         onSelect={() =>
           onSystemSelect(
             "communication"
@@ -156,7 +156,6 @@ function Spacecraft({
       />
 
 
-      {/* REAR PROPULSION */}
       <Engine
         onSelect={() =>
           onSystemSelect(
@@ -164,8 +163,11 @@ function Spacecraft({
           )
         }
       />
+
     </group>
+
   )
+
 }
 
 

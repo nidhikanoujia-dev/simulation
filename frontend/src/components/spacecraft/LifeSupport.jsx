@@ -1,7 +1,113 @@
+import { useRef } from "react"
+import { useFrame } from "@react-three/fiber"
+
+
 export default function LifeSupport({
   onSelect,
-  active
+  active = false,
+  warning = false
 }) {
+
+  const statusMaterialRef = useRef()
+  const warningLightRef = useRef()
+
+
+  useFrame(({ clock }) => {
+
+    if (!statusMaterialRef.current) {
+      return
+    }
+
+
+    const pulse =
+      (Math.sin(
+        clock.elapsedTime * 6
+      ) + 1) / 2
+
+
+    if (active) {
+
+      statusMaterialRef.current.color.set(
+        "#ff2828"
+      )
+
+      statusMaterialRef.current.emissive.set(
+        "#ff0000"
+      )
+
+      statusMaterialRef.current.emissiveIntensity =
+        0.8 + pulse * 4.5
+
+
+      if (warningLightRef.current) {
+
+        warningLightRef.current.color.set(
+          "#ff1c1c"
+        )
+
+        warningLightRef.current.intensity =
+          0.2 + pulse * 2.2
+
+      }
+
+
+      return
+
+    }
+
+
+    if (warning) {
+
+      statusMaterialRef.current.color.set(
+        "#ffe36a"
+      )
+
+      statusMaterialRef.current.emissive.set(
+        "#ffc400"
+      )
+
+      statusMaterialRef.current.emissiveIntensity =
+        0.8 + pulse * 3.5
+
+
+      if (warningLightRef.current) {
+
+        warningLightRef.current.color.set(
+          "#ffd84a"
+        )
+
+        warningLightRef.current.intensity =
+          0.2 + pulse * 1.8
+
+      }
+
+
+      return
+
+    }
+
+
+    statusMaterialRef.current.color.set(
+      "#baffc8"
+    )
+
+    statusMaterialRef.current.emissive.set(
+      "#39ff72"
+    )
+
+    statusMaterialRef.current.emissiveIntensity =
+      1.6
+
+
+    if (warningLightRef.current) {
+
+      warningLightRef.current.intensity =
+        0
+
+    }
+
+  })
+
 
   return (
 
@@ -22,11 +128,6 @@ export default function LifeSupport({
       }}
     >
 
-      {/* ======================================
-          ORANGE LIFE SUPPORT UNIT
-          SAME COLOR DURING NORMAL + FAILURE
-      ====================================== */}
-
       <mesh>
 
         <boxGeometry
@@ -45,8 +146,6 @@ export default function LifeSupport({
 
       </mesh>
 
-
-      {/* FRONT COVER */}
 
       <mesh
         position={[
@@ -73,8 +172,6 @@ export default function LifeSupport({
       </mesh>
 
 
-      {/* INNER PANEL */}
-
       <mesh
         position={[
           0.30,
@@ -100,13 +197,6 @@ export default function LifeSupport({
       </mesh>
 
 
-      {/* ======================================
-          STATUS INDICATOR
-
-          NORMAL = GREEN
-          OXYGEN LEAK = RED
-      ====================================== */}
-
       <mesh
         position={[
           0.325,
@@ -117,53 +207,35 @@ export default function LifeSupport({
 
         <sphereGeometry
           args={[
-            0.085,
-            20,
-            20
+            0.11,
+            22,
+            22
           ]}
         />
 
         <meshStandardMaterial
-          color={
-            active
-              ? "#ff2828"
-              : "#baffc8"
-          }
-          emissive={
-            active
-              ? "#ff0000"
-              : "#39ff72"
-          }
-          emissiveIntensity={
-            active
-              ? 3.5
-              : 1.6
-          }
+          ref={statusMaterialRef}
+          color="#baffc8"
+          emissive="#39ff72"
+          emissiveIntensity={1.6}
         />
 
       </mesh>
 
 
-      {/* SMALL WARNING LIGHT */}
+      <pointLight
+        ref={warningLightRef}
+        position={[
+          0.40,
+          0.32,
+          0
+        ]}
+        color="#ff1c1c"
+        intensity={0}
+        distance={2}
+        decay={2}
+      />
 
-      {active && (
-
-        <pointLight
-          position={[
-            0.40,
-            0.32,
-            0
-          ]}
-          color="#ff1c1c"
-          intensity={1.5}
-          distance={1.4}
-          decay={2}
-        />
-
-      )}
-
-
-      {/* TOP HANDLE */}
 
       <mesh
         position={[
@@ -191,8 +263,6 @@ export default function LifeSupport({
 
       </mesh>
 
-
-      {/* BOTTOM HANDLE */}
 
       <mesh
         position={[
@@ -228,4 +298,5 @@ export default function LifeSupport({
     </group>
 
   )
+
 }

@@ -78,17 +78,6 @@ function EmergencyPanel({
       </button>
 
       <button
-        disabled
-        style={{
-          ...buttonStyle,
-          opacity: 0.25,
-          cursor: "not-allowed"
-        }}
-      >
-        ENGINE FAILURE
-      </button>
-
-      <button
         onClick={onReset}
         style={{
           ...buttonStyle,
